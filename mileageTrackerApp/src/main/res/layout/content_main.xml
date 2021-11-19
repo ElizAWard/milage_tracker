@@ -6,17 +6,19 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/my_text_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="My First App"
-        android:textColor="@color/purple_200"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_purple"
         style="@style/TextAppearance.AppCompat.Large"/>
 
-    <ListView
-        android:id="@+id/receipt_listview"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+<!--    <ListView-->
+<!--        android:id="@+id/receipt_listview"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_weight="1"/>-->
 
 
 </LinearLayout>
