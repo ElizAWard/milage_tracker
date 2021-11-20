@@ -6,7 +6,12 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="add_trip_info">Add Trip Info</string>
+    <string name="add_item">Add Item</string>
+    <string name="current_mileage">Current Mileage</string>
+    <string name="trip_meter">Trip Meter</string>
+    <string name="add_new_fill_up">Add New Fill Up</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="gallons">Gallons</string>
 </resources>

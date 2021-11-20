@@ -46,6 +46,7 @@
         android:layout_marginBottom="16dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/ic_add_white_24" />
+        app:srcCompat="@drawable/ic_add_white_24"
+        android:contentDescription="@string/add_trip_info" />
 
 </RelativeLayout>
