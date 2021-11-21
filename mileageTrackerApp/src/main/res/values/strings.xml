@@ -14,4 +14,6 @@
     <string name="add">Add</string>
     <string name="cancel">Cancel</string>
     <string name="gallons">Gallons</string>
+    <string name="export">Export</string>
+    <string name="import">Import</string>
 </resources>
