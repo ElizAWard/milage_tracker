@@ -1,9 +1,13 @@
 package net.bedesigns.mileagetracker;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Calendar;
 
 public class ReceiptItem {
+
+    private static final SimpleDateFormat americanFormat = new SimpleDateFormat("MM/dd/yyyy");
+
 //    private Instant date;
     private long date;
     private Integer currentMileage;
@@ -44,6 +48,15 @@ public class ReceiptItem {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("Date: %s%nCurrent Mileage: %s%nTrip Meter: %s%nGas Purchase: %s",
+                americanFormat.format(date), currentMileage, tripMiles, gasPurchased));
+
+        return builder.toString();
     }
 
 

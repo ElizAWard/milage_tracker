@@ -6,10 +6,14 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputLayout;
 
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -17,7 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +47,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
+                View addItemView = layoutInflater.inflate(R.layout.add_item_layout, null);
+                TextInputLayout currentMileageTextview = addItemView.findViewById(R.id.item_current_mileage);
+                TextInputLayout tripMeterTextView = addItemView.findViewById(R.id.item_trip_meter);
+                TextInputLayout gallonsTextView = addItemView.findViewById(R.id.item_gallons);
                 alertBuilder.setTitle(R.string.add_new_fill_up)
-                        .setView(R.layout.add_item_layout)
+                        .setView(addItemView)
                         .setPositiveButton(R.string.add, (dialogInterface, i) -> {
                             Toast.makeText(MainActivity.this, "Fill Up Added", LENGTH_SHORT).show();
+                            ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTimeInMillis(),
+                                    getIntFromString(currentMileageTextview.getEditText().getText().toString()),
+                                            getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
+                            Log.d(TAG, String.format("Receipt created: %s", receiptItem));
                         })
                         .setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
                             dialogInterface.dismiss();
@@ -72,5 +89,31 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Integer getIntFromString(String input) {
+        if (input != null && !input.isEmpty()) {
+            try {
+                Integer intValue = Integer.parseInt(input);
+                return intValue;
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Error converting to Integer", e);
+            }
+        }
+
+        return null;
+    }
+
+    private Double getDoubleFromString(String input) {
+        if (input != null && !input.isEmpty()) {
+            try {
+                Double doubleValue = Double.parseDouble(input);
+                return doubleValue;
+            } catch (NumberFormatException e) {
+                Log.e(TAG, "Error converting to Double", e);
+            }
+        }
+
+        return null;
     }
 }
