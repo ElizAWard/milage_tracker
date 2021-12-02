@@ -1,7 +1,9 @@
 package net.bedesigns.mileagetracker;
 
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,7 +13,9 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
     @NonNull
     @Override
     public ReceiptItemAdapter.ReceiptItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View itemLayout = inflater.inflate(R.layout.receipt_item, parent, false);
+        return new ReceiptItemViewHolder(itemLayout);
     }
 
     @Override
@@ -26,8 +30,15 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
     static class ReceiptItemViewHolder extends RecyclerView.ViewHolder {
 
+        TextView dateDisplay;
+        TextView milesDisplay;
+        TextView averageMileageDisplay;
+
         public ReceiptItemViewHolder(@NonNull View itemView) {
             super(itemView);
+            dateDisplay = itemView.findViewById(R.id.date_display);
+            milesDisplay = itemView.findViewById(R.id.miles_display);
+            averageMileageDisplay = itemView.findViewById(R.id.average_mileage_display);
         }
     }
 }
