@@ -50,6 +50,10 @@ public class ReceiptItem {
         }
     }
 
+    public String getDate() {
+        return americanFormat.format(date);
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

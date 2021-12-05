@@ -8,7 +8,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.ReceiptItemViewHolder>{
+
+    private List<ReceiptItem> items = new ArrayList<>();
+
+    public ReceiptItemAdapter(List<ReceiptItem> items) {
+        this.items.addAll(items);
+    }
 
     @NonNull
     @Override
@@ -20,12 +29,17 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ReceiptItemViewHolder holder, int position) {
-
+        holder.bind(this.items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return this.items.size();
+    }
+
+    public void addReceipt(ReceiptItem item) {
+        this.items.add(item);
+        notifyDataSetChanged();
     }
 
     static class ReceiptItemViewHolder extends RecyclerView.ViewHolder {
@@ -39,6 +53,13 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
             dateDisplay = itemView.findViewById(R.id.date_display);
             milesDisplay = itemView.findViewById(R.id.miles_display);
             averageMileageDisplay = itemView.findViewById(R.id.average_mileage_display);
+        }
+
+        public void bind(ReceiptItem receiptItem) {
+            dateDisplay.setText(receiptItem.getDate());
+            milesDisplay.setText(receiptItem.getCurrentMileage());
+            // TODO calculate actual average
+            averageMileageDisplay.setText("12");
         }
     }
 }

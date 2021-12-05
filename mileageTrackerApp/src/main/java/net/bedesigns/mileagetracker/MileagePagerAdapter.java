@@ -19,6 +19,7 @@ public class MileagePagerAdapter extends PagerAdapter {
     private static final String TAG = MileagePagerAdapter.class.getSimpleName();
 
     private Context context;
+    private EntriesPage entriesPage;
     private List<ReceiptItem> receipts = new ArrayList<>();
 
     public MileagePagerAdapter(Context context) {
@@ -51,11 +52,9 @@ public class MileagePagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup collection, int position) {
         if (position == 0) {
             Log.d(TAG, "Instantiate index 0");
-            LayoutInflater inflater = LayoutInflater.from(context);
-            View rootView = inflater.inflate(R.layout.entries_page_layout, null);
-            collection.addView(rootView);
-            // TODO probably need separate class for EntriesPage
-            return rootView;
+            entriesPage = new EntriesPage(collection.getContext());
+            collection.addView(entriesPage);
+            return entriesPage;
         }
 
         Log.d(TAG, String.format("Instantiate index: %s", position));
@@ -72,6 +71,8 @@ public class MileagePagerAdapter extends PagerAdapter {
     }
 
     public void addReceipt(ReceiptItem receiptItem) {
-        receipts.add(receiptItem);
+        if (entriesPage != null) {
+            entriesPage.addReceipt(receiptItem);
+        }
     }
 }

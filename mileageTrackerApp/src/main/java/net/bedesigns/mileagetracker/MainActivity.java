@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private MileagePagerAdapter mileagePagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         ViewPager viewPager = findViewById(R.id.viewpager);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
-        viewPager.setAdapter(new MileagePagerAdapter(this));
+        mileagePagerAdapter = new MileagePagerAdapter(this);
+        viewPager.setAdapter(mileagePagerAdapter);
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -59,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                             ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTimeInMillis(),
                                     getIntFromString(currentMileageTextview.getEditText().getText().toString()),
                                             getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
+                            mileagePagerAdapter.addReceipt(receiptItem);
                             Log.d(TAG, String.format("Receipt created: %s", receiptItem));
                         })
                         .setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
