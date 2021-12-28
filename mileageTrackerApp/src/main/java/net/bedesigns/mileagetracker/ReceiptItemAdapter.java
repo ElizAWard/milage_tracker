@@ -57,7 +57,7 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
         public void bind(ReceiptItem receiptItem) {
             dateDisplay.setText(receiptItem.getDate());
-            milesDisplay.setText(receiptItem.getCurrentMileage());
+            milesDisplay.setText(receiptItem.getCurrentMileage().toString());
             // TODO calculate actual average
             averageMileageDisplay.setText("12");
         }

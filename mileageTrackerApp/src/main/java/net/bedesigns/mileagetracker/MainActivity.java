@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private MileagePagerAdapter mileagePagerAdapter;
+    private double previousMileage = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +56,19 @@ public class MainActivity extends AppCompatActivity {
                 TextInputLayout currentMileageTextview = addItemView.findViewById(R.id.item_current_mileage);
                 TextInputLayout tripMeterTextView = addItemView.findViewById(R.id.item_trip_meter);
                 TextInputLayout gallonsTextView = addItemView.findViewById(R.id.item_gallons);
+
                 alertBuilder.setTitle(R.string.add_new_fill_up)
                         .setView(addItemView)
                         .setPositiveButton(R.string.add, (dialogInterface, i) -> {
+                            double currentMileage = getDoubleFromString(
+                                    currentMileageTextview.getEditText().getText().toString());
                             Toast.makeText(MainActivity.this, "Fill Up Added", LENGTH_SHORT).show();
                             ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTimeInMillis(),
-                                    getIntFromString(currentMileageTextview.getEditText().getText().toString()),
-                                            getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
+                                    previousMileage, currentMileage,
+                                    getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
                             mileagePagerAdapter.addReceipt(receiptItem);
                             Log.d(TAG, String.format("Receipt created: %s", receiptItem));
+                            previousMileage = currentMileage;
                         })
                         .setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
                             dialogInterface.dismiss();

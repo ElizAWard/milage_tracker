@@ -10,27 +10,32 @@ public class ReceiptItem {
 
 //    private Instant date;
     private long date;
-    private Integer currentMileage;
-    private Integer tripMiles;
+    private double previousMileage;
+    private double currentMileage;
+    private Double tripMiles;
     private double gasPurchased;
 
-    public ReceiptItem(int currentMileage, double gasPurchased) {
-        this(Calendar.getInstance().getTimeInMillis(), currentMileage, gasPurchased);
+    public ReceiptItem(double previousMileage, double currentMileage, double gasPurchased) {
+        this(Calendar.getInstance().getTimeInMillis(), previousMileage, currentMileage, gasPurchased);
     }
 
-    public ReceiptItem(Long date, int currentMileage, double gasPurchased) {
-        this(date, currentMileage, null, gasPurchased);
+    public ReceiptItem(Long date, double previousMileage, double currentMileage, double gasPurchased) {
+        this(date, previousMileage, currentMileage, null, gasPurchased);
     }
 
-    public ReceiptItem(Long date, Integer currentMileage, Integer tripMiles, double gasPurchased) {
+    public ReceiptItem(Long date, double previousMileage, double currentMileage, Double tripMiles, double gasPurchased) {
         this.date = date;
         this.currentMileage = currentMileage;
         this.tripMiles = tripMiles;
         this.gasPurchased = gasPurchased;
     }
 
-    public Integer getCurrentMileage() {
+    public Double getCurrentMileage() {
         return currentMileage;
+    }
+
+    public Double getPreviousMileage() {
+        return previousMileage;
     }
 
     public double getGasPurchased() {
@@ -57,8 +62,8 @@ public class ReceiptItem {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("Date: %s%nCurrent Mileage: %s%nTrip Meter: %s%nGas Purchase: %s",
-                americanFormat.format(date), currentMileage, tripMiles, gasPurchased));
+        builder.append(String.format("Date: %s%nPrevious Mileage: %s%nCurrent Mileage: %s%nTrip Meter: %s%nGas Purchase: %s",
+                americanFormat.format(date), previousMileage, currentMileage, tripMiles, gasPurchased));
 
         return builder.toString();
     }
