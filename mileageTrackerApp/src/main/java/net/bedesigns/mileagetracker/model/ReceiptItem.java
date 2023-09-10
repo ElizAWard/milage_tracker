@@ -1,4 +1,4 @@
-package net.bedesigns.mileagetracker;
+package net.bedesigns.mileagetracker.model;
 
 import java.time.Instant;
 import java.util.Calendar;
