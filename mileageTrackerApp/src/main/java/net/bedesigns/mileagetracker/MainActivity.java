@@ -17,7 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
+import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
+
 public class MainActivity extends AppCompatActivity {
+
+    private IReceiptItemCollection fillupLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

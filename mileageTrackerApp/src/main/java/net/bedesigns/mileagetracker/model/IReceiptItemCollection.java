@@ -18,6 +18,13 @@ public interface IReceiptItemCollection {
     public void CreateVehicle(String vehicleName);
 
     /**
+     * Sets the active vehicle to get / set items for.
+     * @param vehicleName The name of the vehicle.
+     * @return True if successfully set, false otherwise.
+     */
+    public boolean SetActiveVehicle(String vehicleName);
+
+    /**
      * Adds a new {@link ReceiptItem} to the collection.
      * @param receipt The receipt to add.
      */
@@ -26,8 +33,9 @@ public interface IReceiptItemCollection {
     /**
      * Deletes a given {@link ReceiptItem} from the collection.
      * @param receipt The receipt to delete.
+     * @return True if successfully deleted, false otherwise.
      */
-    public void DeleteReceipt(ReceiptItem receipt);
+    public boolean DeleteReceipt(ReceiptItem receipt);
 
     /**
      * Retrieves a list of {@link ReceiptItem} from between the start and end dates.
