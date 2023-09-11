@@ -21,7 +21,7 @@ import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
 
 public class MainActivity extends AppCompatActivity {
 
-    private IReceiptItemCollection fillupLists;
+    private IReceiptItemCollection fillUpLists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
