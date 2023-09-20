@@ -18,6 +18,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
+import net.bedesigns.mileagetracker.model.ReceiptItemRoom;
+import net.bedesigns.mileagetracker.room.ReceiptItemDao;
+import net.bedesigns.mileagetracker.room.ReceiptItemDatabase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         viewPager.setAdapter(new MileagePagerAdapter(this));
+        fillUpLists = new ReceiptItemRoom(CreateReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -76,5 +80,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private ReceiptItemDao CreateReceiptItemDao() {
+        ReceiptItemDatabase database = ReceiptItemDatabase.GetDatabase(this);
+        return database.ReceiptItemDao();
     }
 }
