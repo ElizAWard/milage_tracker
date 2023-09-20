@@ -13,9 +13,19 @@ public interface IReceiptItemCollection {
 
     /**
      * Creates a new vehicle to store records for.
+     * <p>
+     * This will set the new vehicle as the active vehicle.
      * @param vehicleName The name of the new vehicle.
      */
     void CreateVehicle(String vehicleName);
+
+    /**
+     * Removes an added vehicle to store records for.
+     * <p>
+     * This will set the active vehicle to null. Use the {@link #SetActiveVehicle(String)} method immediately after calling this method.
+     * @param vehicleName The name of the new vehicle.
+     */
+    void DeleteVehicle(String vehicleName);
 
     /**
      * Sets the active vehicle to get / set items for.

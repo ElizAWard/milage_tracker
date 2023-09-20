@@ -15,6 +15,9 @@ public interface ReceiptItemDao {
     @Delete
     int DeleteReceiptItem(ReceiptItemEntity receipt);
 
+    @Delete
+    int DeleteReceiptItem(List<ReceiptItemEntity> receipt);
+
     @Query("SELECT DISTINCT vehicleName FROM Fill_ups")
     List<String> GetAllVehicles();
 
