@@ -13,14 +13,14 @@ import java.util.concurrent.Executors;
 
 @Database(entities = {ReceiptItemEntity.class}, version = 1)
 public abstract class ReceiptItemDatabase extends RoomDatabase {
-    public abstract ReceiptItemEntity ReceiptItemEntity();
+    public abstract ReceiptItemDao ReceiptItemDao();
 
     private static volatile ReceiptItemDatabase Instance;
     private static final int NUMBER_THREADS = 4;
-    static final ExecutorService databaseWriteExecutor =
+    public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_THREADS);
 
-    static ReceiptItemDatabase GetDatabase(final Context context) {
+    public static ReceiptItemDatabase GetDatabase(final Context context) {
         if (Instance == null) {
             synchronized (ReceiptItemDatabase.class) {
                 if (Instance == null) {
