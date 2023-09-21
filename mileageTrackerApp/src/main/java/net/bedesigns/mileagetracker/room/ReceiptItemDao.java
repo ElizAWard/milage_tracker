@@ -10,17 +10,17 @@ import java.util.List;
 @Dao
 public interface ReceiptItemDao {
     @Upsert
-    void InsertOrUpdateReceiptItems(List<ReceiptItemEntity> receipts);
+    void insertOrUpdateReceiptItems(List<ReceiptItemEntity> receipts);
 
     @Delete
-    int DeleteReceiptItem(ReceiptItemEntity receipt);
+    int deleteReceiptItem(ReceiptItemEntity receipt);
 
     @Delete
-    int DeleteReceiptItem(List<ReceiptItemEntity> receipt);
+    int deleteReceiptItem(List<ReceiptItemEntity> receipt);
 
-    @Query("SELECT DISTINCT vehicleName FROM Fill_ups")
-    List<String> GetAllVehicles();
+    @Query("SELECT DISTINCT vehicleName FROM receiptItemEntity")
+    List<String> getAllVehicles();
 
-    @Query("SELECT * FROM Fill_ups WHERE vehicleName LIKE :vehicleName")
-    List<ReceiptItemEntity> GetAllForVehicle(String vehicleName);
+    @Query("SELECT * FROM receiptItemEntity WHERE vehicleName LIKE :vehicleName")
+    List<ReceiptItemEntity> getAllForVehicle(String vehicleName);
 }

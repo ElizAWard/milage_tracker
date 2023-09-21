@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class ReceiptItem {
-//    private Instant date;
     private Date date;
     private int currentMileage;
     private double gasPurchased;
@@ -19,15 +18,15 @@ public class ReceiptItem {
         this.gasPurchased = gasPurchased;
     }
 
-    public Date GetDate() {
+    public Date getDate() {
         return date;
     }
 
-    public int GetCurrentMileage() {
+    public int getCurrentMileage() {
         return currentMileage;
     }
 
-    public double GetGallonsPurchased() {
+    public double getGallonsPurchased() {
         return gasPurchased;
     }
 }
