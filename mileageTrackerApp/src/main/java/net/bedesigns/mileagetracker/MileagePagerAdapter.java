@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import net.bedesigns.mileagetracker.model.ReceiptItem;
+
 import java.util.ArrayList;
 import java.util.List;
 

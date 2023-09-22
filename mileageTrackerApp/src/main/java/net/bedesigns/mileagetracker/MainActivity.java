@@ -23,10 +23,17 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.util.Calendar;
 
+import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
+import net.bedesigns.mileagetracker.model.ReceiptItem;
+import net.bedesigns.mileagetracker.model.ReceiptItemRoom;
+import net.bedesigns.mileagetracker.room.ReceiptItemDao;
+import net.bedesigns.mileagetracker.room.ReceiptItemDatabase;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private IReceiptItemCollection fillUpLists;
     private MileagePagerAdapter mileagePagerAdapter;
     private double previousMileage = 0;
 
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         mileagePagerAdapter = new MileagePagerAdapter(this);
         viewPager.setAdapter(mileagePagerAdapter);
+        fillUpLists = new ReceiptItemRoom(CreateReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -60,11 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 alertBuilder.setTitle(R.string.add_new_fill_up)
                         .setView(addItemView)
                         .setPositiveButton(R.string.add, (dialogInterface, i) -> {
-                            double currentMileage = getDoubleFromString(
+                            int currentMileage = getIntFromString(
                                     currentMileageTextview.getEditText().getText().toString());
                             Toast.makeText(MainActivity.this, "Fill Up Added", LENGTH_SHORT).show();
-                            ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTimeInMillis(),
-                                    previousMileage, currentMileage,
+                            ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTime(), currentMileage,
                                     getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
                             mileagePagerAdapter.addReceipt(receiptItem);
                             Log.d(TAG, String.format("Receipt created: %s", receiptItem));
@@ -98,6 +105,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private ReceiptItemDao CreateReceiptItemDao() {
+        ReceiptItemDatabase database = ReceiptItemDatabase.GetDatabase(this);
+        return database.ReceiptItemDao();
     }
 
     private Integer getIntFromString(String input) {

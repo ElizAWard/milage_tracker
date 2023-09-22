@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.bedesigns.mileagetracker.model.ReceiptItem;
+
 import java.util.ArrayList;
 import java.util.List;
 

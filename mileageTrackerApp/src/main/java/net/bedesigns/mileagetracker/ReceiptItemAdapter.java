@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import net.bedesigns.mileagetracker.model.ReceiptItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +58,8 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
         }
 
         public void bind(ReceiptItem receiptItem) {
-            dateDisplay.setText(receiptItem.getDate());
-            milesDisplay.setText(receiptItem.getCurrentMileage().toString());
+            dateDisplay.setText(receiptItem.GetDate().toString());
+            milesDisplay.setText(receiptItem.GetCurrentMileage());
             // TODO calculate actual average
             averageMileageDisplay.setText("12");
         }
