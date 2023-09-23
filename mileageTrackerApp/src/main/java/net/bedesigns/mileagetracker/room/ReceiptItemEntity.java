@@ -17,7 +17,6 @@ public class ReceiptItemEntity {
     @NonNull
     public double gallonsPurchased;
 
-    @Ignore
     public ReceiptItemEntity() {}
 
     @Ignore
