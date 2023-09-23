@@ -15,5 +15,8 @@
     <string name="cancel">Cancel</string>
     <string name="gallons">Gallons</string>
     <string name="export">Export</string>
-    <string name="import">Import</string>
+    <string name="import_string">Import</string>
+    <string name="date">Date</string>
+    <string name="miles">Miles</string>
+    <string name="mpg">MPG</string>
 </resources>
