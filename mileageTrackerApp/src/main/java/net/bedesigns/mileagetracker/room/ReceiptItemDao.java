@@ -18,9 +18,9 @@ public interface ReceiptItemDao {
     @Delete
     int deleteReceiptItem(List<ReceiptItemEntity> receipt);
 
-    @Query("SELECT DISTINCT vehicleName FROM receiptItemEntity")
+    @Query("SELECT DISTINCT vehicleName FROM Fill_ups")
     List<String> getAllVehicles();
 
-    @Query("SELECT * FROM receiptItemEntity WHERE vehicleName LIKE :vehicleName")
+    @Query("SELECT * FROM Fill_ups WHERE vehicleName LIKE :vehicleName")
     List<ReceiptItemEntity> getAllForVehicle(String vehicleName);
 }
