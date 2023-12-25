@@ -25,7 +25,7 @@ import java.util.Calendar;
 
 import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
 import net.bedesigns.mileagetracker.model.ReceiptItem;
-import net.bedesigns.mileagetracker.model.ReceiptItemRoom;
+import net.bedesigns.mileagetracker.room.ReceiptItemRoom;
 import net.bedesigns.mileagetracker.room.ReceiptItemDao;
 import net.bedesigns.mileagetracker.room.ReceiptItemDatabase;
 
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         mileagePagerAdapter = new MileagePagerAdapter(this);
         viewPager.setAdapter(mileagePagerAdapter);
-        fillUpLists = new ReceiptItemRoom(CreateReceiptItemDao());
+        fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private ReceiptItemDao CreateReceiptItemDao() {
-        ReceiptItemDatabase database = ReceiptItemDatabase.GetDatabase(this);
-        return database.ReceiptItemDao();
+    private ReceiptItemDao createReceiptItemDao() {
+        ReceiptItemDatabase database = ReceiptItemDatabase.getDatabase(this);
+        return database.receiptItemDao();
     }
 
     private Integer getIntFromString(String input) {
