@@ -43,15 +43,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         ViewPager viewPager = findViewById(R.id.viewpager);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         mileagePagerAdapter = new MileagePagerAdapter(this);
         viewPager.setAdapter(mileagePagerAdapter);
-        fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
+        // ToDo this needs to happen on another thread
+//        fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
