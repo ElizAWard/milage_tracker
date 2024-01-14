@@ -7,16 +7,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ReceiptItemRoom implements IReceiptItemCollection {
     private final ReceiptItemDao dao;
-    private final List<String> availableVehicles;
+    private List<String> availableVehicles;
     private List<ReceiptItem> currentVehicleData;
     private String currentVehicle;
 
     public ReceiptItemRoom(ReceiptItemDao dao) {
         this.dao = Objects.requireNonNull(dao, "Data access object must not be null.");
-        availableVehicles = this.dao.getAllVehicles();
+        ReceiptItemDatabase.databaseWriteExecutor.execute(() ->
+                availableVehicles = this.dao.getAllVehicles());
     }
 
     @Override
@@ -34,7 +37,8 @@ public class ReceiptItemRoom implements IReceiptItemCollection {
 
     @Override
     public void deleteVehicle(String vehicleName) {
-        dao.deleteReceiptItem(convertModelToEntity(currentVehicleData));
+        ReceiptItemDatabase.databaseWriteExecutor.execute(() ->
+                dao.deleteReceiptItem(convertModelToEntity(currentVehicleData)));
         availableVehicles.remove(vehicleName);
         currentVehicleData = new ArrayList<>();
         currentVehicle = null;
@@ -46,7 +50,8 @@ public class ReceiptItemRoom implements IReceiptItemCollection {
 
         if (isListedVehicle) {
             saveToPersistentStorage();
-            currentVehicleData = convertEntityToModel(dao.getAllForVehicle(vehicleName));
+            ReceiptItemDatabase.databaseWriteExecutor.execute(() ->
+                    currentVehicleData = convertEntityToModel(dao.getAllForVehicle(vehicleName)));
             currentVehicle = vehicleName;
         }
 
@@ -61,7 +66,16 @@ public class ReceiptItemRoom implements IReceiptItemCollection {
     @Override
     public boolean deleteReceipt(ReceiptItem receipt) {
         boolean removedFromList = currentVehicleData.remove(receipt);
-        boolean removedFromDatabase = dao.deleteReceiptItem(convertModelToEntity(receipt)) == 1;
+        boolean removedFromDatabase;
+
+        Future<Integer> future = ReceiptItemDatabase.databaseWriteExecutor.submit(() ->
+                dao.deleteReceiptItem(convertModelToEntity(receipt)));
+
+        try {
+            removedFromDatabase = future.get() == 1;
+        } catch (ExecutionException | InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
 
         return removedFromList && removedFromDatabase;
     }
