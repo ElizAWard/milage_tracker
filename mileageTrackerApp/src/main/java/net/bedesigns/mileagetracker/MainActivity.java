@@ -48,8 +48,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         mileagePagerAdapter = new MileagePagerAdapter(this);
         viewPager.setAdapter(mileagePagerAdapter);
-        // ToDo this needs to happen on another thread
-//        fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
+        fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
         FloatingActionButton fab = findViewById(R.id.fab);
