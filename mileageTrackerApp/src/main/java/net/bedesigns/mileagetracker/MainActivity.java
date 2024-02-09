@@ -19,8 +19,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
@@ -34,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private IReceiptItemCollection fillUpLists;
-    private MileagePagerAdapter mileagePagerAdapter;
+    private RecyclerView entriesRecyclerView;
+    private ReceiptItemAdapter receiptAdapter;
     private double previousMileage = 0;
 
     @Override
@@ -43,11 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        ViewPager viewPager = findViewById(R.id.viewpager);
-        TabLayout tabLayout = findViewById(R.id.tab_layout);
-        tabLayout.setupWithViewPager(viewPager);
-        mileagePagerAdapter = new MileagePagerAdapter(this);
-        viewPager.setAdapter(mileagePagerAdapter);
         fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
@@ -59,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
                 View addItemView = layoutInflater.inflate(R.layout.add_item_layout, null);
                 TextInputLayout currentMileageTextview = addItemView.findViewById(R.id.item_current_mileage);
-                TextInputLayout tripMeterTextView = addItemView.findViewById(R.id.item_trip_meter);
                 TextInputLayout gallonsTextView = addItemView.findViewById(R.id.item_gallons);
 
                 alertBuilder.setTitle(R.string.add_new_fill_up)
@@ -70,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "Fill Up Added", LENGTH_SHORT).show();
                             ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTime(), currentMileage,
                                     getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
-                            mileagePagerAdapter.addReceipt(receiptItem);
+                            if (receiptAdapter != null) {
+                                receiptAdapter.addReceipt(receiptItem);
+                            }
                             Log.d(TAG, String.format("Receipt created: %s", receiptItem));
                             previousMileage = currentMileage;
                         })
@@ -80,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
                 alertBuilder.show();
             }
         });
+
+        entriesRecyclerView = findViewById(R.id.entries_recyclerview);
+        // TODO get receipts from whatever way we are saving it
+        receiptAdapter = new ReceiptItemAdapter(new ArrayList<>());
+        entriesRecyclerView.setAdapter(receiptAdapter);
     }
 
     @Override

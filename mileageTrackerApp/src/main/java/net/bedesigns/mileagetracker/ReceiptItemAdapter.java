@@ -15,10 +15,10 @@ import java.util.List;
 
 public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.ReceiptItemViewHolder>{
 
-    private List<ReceiptItem> items = new ArrayList<>();
+    private List<ReceiptItem> items;
 
     public ReceiptItemAdapter(List<ReceiptItem> items) {
-        this.items.addAll(items);
+        this.items = items;
     }
 
     @NonNull
@@ -36,12 +36,12 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
     @Override
     public int getItemCount() {
-        return this.items.size();
+        return items.size();
     }
 
     public void addReceipt(ReceiptItem item) {
-        this.items.add(item);
-        notifyDataSetChanged();
+        items.add(item);
+        notifyItemInserted(items.size());
     }
 
     static class ReceiptItemViewHolder extends RecyclerView.ViewHolder {

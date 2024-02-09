@@ -5,43 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/my_app_bar_layout"
+    <LinearLayout
+        android:id="@+id/column_titles"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/date"/>
 
-    </com.google.android.material.appbar.AppBarLayout>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/odometer" />
 
-    <TextView
-        android:id="@+id/my_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/my_app_bar_layout"
-        android:text="My First App"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_purple"
-        style="@style/TextAppearance.AppCompat.Large"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/mpg" />
+    </LinearLayout>
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpager"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/entries_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/my_text_view"
-        android:layout_alignParentBottom="true">
-        
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_below="@id/column_titles"
+        android:layout_alignParentBottom="true"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

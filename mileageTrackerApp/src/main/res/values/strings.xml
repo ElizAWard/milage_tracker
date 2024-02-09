@@ -19,4 +19,5 @@
     <string name="date">Date</string>
     <string name="miles">Miles</string>
     <string name="mpg">MPG</string>
+    <string name="odometer">Odometer</string>
 </resources>
