@@ -2,30 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@color/design_default_color_secondary">
 
     <TextView
         android:id="@+id/date_display"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/date"/>
+        android:gravity="center"/>
 
     <TextView
-        android:id="@+id/miles_display"
+        android:id="@+id/gallons_display"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/miles" />
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/odometer_display"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/gas_entry_height"
+        android:layout_weight="1"
+        android:gravity="center"/>
 
     <TextView
         android:id="@+id/average_mileage_display"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/mpg" />
+        android:gravity="center"/>
 
 </LinearLayout>

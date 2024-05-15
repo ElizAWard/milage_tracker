@@ -12,7 +12,7 @@ import androidx.room.TypeConverters;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {ReceiptItemEntity.class}, version = 1)
+@Database(entities = {ReceiptItemEntity.class}, version = 2)
 @TypeConverters({Converters.class})
 public abstract class ReceiptItemDatabase extends RoomDatabase {
     public abstract ReceiptItemDao receiptItemDao();
@@ -28,6 +28,7 @@ public abstract class ReceiptItemDatabase extends RoomDatabase {
                 if (Instance == null) {
                     Instance = Room.databaseBuilder(context.getApplicationContext(),
                             ReceiptItemDatabase.class, "ReceiptItemDatabase")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

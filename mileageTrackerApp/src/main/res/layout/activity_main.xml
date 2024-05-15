@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="@dimen/font_heading_size"
             android:text="@string/date"/>
 
         <TextView
@@ -24,6 +25,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="@dimen/font_heading_size"
+            android:text="@string/gallons"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="@dimen/font_heading_size"
             android:text="@string/odometer" />
 
         <TextView
@@ -31,23 +41,25 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="@dimen/font_heading_size"
             android:text="@string/mpg" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/entries_recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/column_titles"
+        android:background="@color/design_default_color_primary"
         android:layout_alignParentBottom="true"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="@dimen/fab_margin"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/ic_add_white_24"

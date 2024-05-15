@@ -25,6 +25,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import net.bedesigns.mileagetracker.model.IReceiptItemCollection;
 import net.bedesigns.mileagetracker.model.ReceiptItem;
@@ -37,9 +38,29 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private IReceiptItemCollection fillUpLists;
-    private RecyclerView entriesRecyclerView;
-    private ReceiptItemAdapter receiptAdapter;
-    private double previousMileage = 0;
+    private static RecyclerView entriesRecyclerView;
+    private static ReceiptItemAdapter receiptAdapter;
+    private static int previousMileage = 0;
+
+    private static final ItemAddedCallback receiptItemAdded = new ItemAddedCallback() {
+        @Override
+        public void onItemAdded(Date receiptDate, String currentMileageStr, String gallonsPurchasedStr) {
+            int currentMileage = getIntFromString(currentMileageStr);
+            double gallonsPurchased = getDoubleFromString(gallonsPurchasedStr);
+
+            ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTime(),
+                    gallonsPurchased, currentMileage, previousMileage);
+
+            if (receiptAdapter != null) {
+                receiptAdapter.addReceipt(receiptItem);
+            }
+
+            Log.d(TAG, String.format("Receipt created: %s", receiptItem));
+            previousMileage = currentMileage;
+
+            receiptAdapter.notifyDataSetChanged();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +83,13 @@ public class MainActivity extends AppCompatActivity {
 
                 alertBuilder.setTitle(R.string.add_new_fill_up)
                         .setView(addItemView)
+                        .setCancelable(false)
                         .setPositiveButton(R.string.add, (dialogInterface, i) -> {
-                            int currentMileage = getIntFromString(
-                                    currentMileageTextview.getEditText().getText().toString());
+                            receiptItemAdded.onItemAdded(Calendar.getInstance().getTime(),
+                                    currentMileageTextview.getEditText().getText().toString(),
+                                    gallonsTextView.getEditText().getText().toString());
+
                             Toast.makeText(MainActivity.this, "Fill Up Added", LENGTH_SHORT).show();
-                            ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTime(), currentMileage,
-                                    getDoubleFromString(gallonsTextView.getEditText().getText().toString()));
-                            if (receiptAdapter != null) {
-                                receiptAdapter.addReceipt(receiptItem);
-                            }
-                            Log.d(TAG, String.format("Receipt created: %s", receiptItem));
-                            previousMileage = currentMileage;
                         })
                         .setNegativeButton(R.string.cancel, (dialogInterface, i) -> {
                             dialogInterface.dismiss();
@@ -82,6 +99,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         entriesRecyclerView = findViewById(R.id.entries_recyclerview);
+        entriesRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this,
+                RecyclerView.VERTICAL, true));
         // TODO get receipts from whatever way we are saving it
         receiptAdapter = new ReceiptItemAdapter(new ArrayList<>());
         entriesRecyclerView.setAdapter(receiptAdapter);
@@ -114,11 +133,10 @@ public class MainActivity extends AppCompatActivity {
         return database.receiptItemDao();
     }
 
-    private Integer getIntFromString(String input) {
+    private static Integer getIntFromString(String input) {
         if (input != null && !input.isEmpty()) {
             try {
-                Integer intValue = Integer.parseInt(input);
-                return intValue;
+                return Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 Log.e(TAG, "Error converting to Integer", e);
             }
@@ -127,16 +145,19 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    private Double getDoubleFromString(String input) {
+    private static Double getDoubleFromString(String input) {
         if (input != null && !input.isEmpty()) {
             try {
-                Double doubleValue = Double.parseDouble(input);
-                return doubleValue;
+                return Double.parseDouble(input);
             } catch (NumberFormatException e) {
                 Log.e(TAG, "Error converting to Double", e);
             }
         }
 
         return null;
+    }
+
+    private static interface ItemAddedCallback {
+        void onItemAdded(Date receiptDate, String currentMileage, String gallonsPurchased);
     }
 }

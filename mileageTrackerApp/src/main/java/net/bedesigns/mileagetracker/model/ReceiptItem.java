@@ -5,28 +5,35 @@ import java.util.Date;
 
 public class ReceiptItem {
     private Date date;
-    private int currentMileage;
-    private double gasPurchased;
+    private Double gasPurchased;
+    private Integer currentMileage;
+    private Integer previousMileage;
 
-    public ReceiptItem(int currentMileage, double gasPurchased) {
-        this(Calendar.getInstance().getTime(), currentMileage, gasPurchased);
-    }
-
-    public ReceiptItem(Date date, int currentMileage, double gasPurchased) {
+    public ReceiptItem(Date date, double gasPurchased, Integer currentMileage, int previousMileage) {
         this.date = date;
         this.currentMileage = currentMileage;
         this.gasPurchased = gasPurchased;
+        this.previousMileage = previousMileage;
     }
 
     public Date getDate() {
         return date;
     }
 
-    public int getCurrentMileage() {
+    public Double getGallonsPurchased() {
+        return gasPurchased;
+    }
+    public Integer getCurrentMileage() {
         return currentMileage;
     }
 
-    public double getGallonsPurchased() {
-        return gasPurchased;
+
+    public Integer getPreviousMileage() {
+        return previousMileage;
+    }
+
+    public Double getAverageMpg() {
+        int tripMiles = currentMileage - previousMileage;
+        return tripMiles / gasPurchased;
     }
 }

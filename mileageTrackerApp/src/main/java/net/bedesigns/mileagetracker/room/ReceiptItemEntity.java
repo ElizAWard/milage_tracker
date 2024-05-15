@@ -13,17 +13,20 @@ public class ReceiptItemEntity {
     @NonNull
     public Date date;
     @NonNull
-    public int currentMileage;
-    @NonNull
     public double gallonsPurchased;
+    @NonNull
+    public int currentMileage;
+    public int previousMileage;
 
     public ReceiptItemEntity() {}
 
     @Ignore
-    public ReceiptItemEntity(String vehicleName, Date date, int currentMileage, double gallonsPurchased) {
+    public ReceiptItemEntity(String vehicleName, Date date, double gallonsPurchased,
+                             int currentMileage, int previousMileage) {
         this.vehicleName = vehicleName;
         this.date = date;
         this.currentMileage = currentMileage;
         this.gallonsPurchased = gallonsPurchased;
+        this.previousMileage = previousMileage;
     }
 }

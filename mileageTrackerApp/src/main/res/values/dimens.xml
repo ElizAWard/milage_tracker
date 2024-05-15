@@ -2,4 +2,8 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="min_height_size">48dp</dimen>
     <dimen name="min_width_size">32dp</dimen>
+    <dimen name="font_label_size">20sp</dimen>
+    <dimen name="font_heading_size">20sp</dimen>
+    <dimen name="fab_size">40dp</dimen>
+    <dimen name="gas_entry_height">20dp</dimen>
 </resources>
