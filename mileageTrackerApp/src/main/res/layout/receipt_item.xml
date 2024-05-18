@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/design_default_color_secondary">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/date_display"
         android:layout_width="0dp"
         android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
+        android:textSize="@dimen/font_entry_size"
         android:gravity="center"/>
 
     <TextView
@@ -17,6 +17,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
+        android:textSize="@dimen/font_entry_size"
         android:gravity="center" />
 
     <TextView
@@ -24,6 +25,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
+        android:textSize="@dimen/font_entry_size"
         android:gravity="center"/>
 
     <TextView
@@ -31,6 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/gas_entry_height"
         android:layout_weight="1"
+        android:textSize="@dimen/font_entry_size"
         android:gravity="center"/>
 
 </LinearLayout>

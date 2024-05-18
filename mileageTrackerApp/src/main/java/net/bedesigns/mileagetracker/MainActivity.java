@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
         fillUpLists = new ReceiptItemRoom(createReceiptItemDao());
 
         // TODO fab could be an exploding fab and allow for adding vehicles
