@@ -67,8 +67,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         RecyclerView entriesRecyclerView = findViewById(R.id.entries_recyclerview);
+        // Newest first (the query orders by mileage DESC, index 0 = latest), so the list is laid
+        // out top-down rather than reversed. reversed=true would push the newest row to the bottom.
         entriesRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this,
-                RecyclerView.VERTICAL, true));
+                RecyclerView.VERTICAL, false));
         receiptAdapter = new ReceiptItemAdapter(new ArrayList<>());
         entriesRecyclerView.setAdapter(receiptAdapter);
 
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             List<ReceiptItem> items = FillUpViewModel.toModel(entities);
             receiptAdapter.setReceipts(items);
 
-            // Query returns newest first, and the layout is reversed, so index 0 is the latest.
+            // Query orders by mileage DESC, so index 0 is the most recent fill-up.
             previousMileage = items.isEmpty() ? null : items.get(0).getCurrentMileage();
 
             Log.d(TAG, String.format("Loaded %d saved fill-up(s)", items.size()));
