@@ -1,37 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:baselineAligned="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
+    <!-- Read-only on purpose: tapping opens the date picker instead of the keyboard. -->
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/item_current_mileage"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/min_height_size"
-        android:layout_weight="1"
-        android:hint="@string/current_mileage"
+        android:id="@+id/item_receipt_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/date"
+        app:boxBackgroundMode="none"
         app:hintEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/item_receipt_date_value"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/min_height_size"
-            android:inputType="number" />
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            android:longClickable="false" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/item_gallons"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/min_height_size"
-        android:layout_weight="1"
-        android:hint="@string/gallons">
+    <!-- Mileage and gallons share a row, as they did before the date field was added.
+         Fixed heights (rather than wrap_content) keep the two halves equal whenever one
+         of their floating labels expands. -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/min_height_size"
-            android:inputType="numberDecimal"/>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_current_mileage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/current_mileage"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="true">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_gallons"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/gallons"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 
 </LinearLayout>

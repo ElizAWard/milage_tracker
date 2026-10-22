@@ -1,0 +1,59 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "13d9f12d2ad17b1e50f0f3eb43fcc091",
+    "entities": [
+      {
+        "tableName": "Fill_ups",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vehicleName` TEXT NOT NULL, `date` INTEGER NOT NULL, `gallonsPurchased` REAL NOT NULL, `currentMileage` INTEGER NOT NULL, `previousMileage` INTEGER, PRIMARY KEY(`vehicleName`, `currentMileage`))",
+        "fields": [
+          {
+            "fieldPath": "vehicleName",
+            "columnName": "vehicleName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gallonsPurchased",
+            "columnName": "gallonsPurchased",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "currentMileage",
+            "columnName": "currentMileage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previousMileage",
+            "columnName": "previousMileage",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "vehicleName",
+            "currentMileage"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '13d9f12d2ad17b1e50f0f3eb43fcc091')"
+    ]
+  }
+}
