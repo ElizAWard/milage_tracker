@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.bedesigns.mileagetracker.model.ReceiptItem;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -20,6 +22,14 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
     private static final String NO_MPG = "\u2014";
 
     private final List<ReceiptItem> items = new ArrayList<>();
+
+    /**
+     * How a receipt date reads everywhere it is shown (the list and the add dialog), so an entry
+     * picked as an old date and one created today are rendered identically.
+     */
+    public static String formatDate(Date date) {
+        return DateFormat.getDateInstance(DateFormat.MEDIUM).format(date);
+    }
 
     public ReceiptItemAdapter(List<ReceiptItem> items) {
         this.items.addAll(items);
@@ -70,7 +80,7 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
         }
 
         public void bind(ReceiptItem receiptItem) {
-            dateDisplay.setText(receiptItem.getDate().toString());
+            dateDisplay.setText(formatDate(receiptItem.getDate()));
             gallonsDisplay.setText(receiptItem.getGallonsPurchased().toString());
             odometerDisplay.setText(receiptItem.getCurrentMileage().toString());
 

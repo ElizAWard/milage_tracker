@@ -2,12 +2,14 @@ package net.bedesigns.mileagetracker;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
      * one. Restored from the database on start, so MPG stays correct across restarts.
      */
     private Integer previousMileage;
+    /**
+     * Date attached to the fill-up currently being entered. Defaulted to today every time the
+     * dialog opens, and changed only if the user picks a different day from the date picker.
+     * Time of day is always zeroed: a receipt only has a day, never an hour.
+     */
+    private Calendar receiptDate = Calendar.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
                 View addItemView = layoutInflater.inflate(R.layout.add_item_layout, null);
                 TextInputLayout currentMileageTextview = addItemView.findViewById(R.id.item_current_mileage);
                 TextInputLayout gallonsTextView = addItemView.findViewById(R.id.item_gallons);
+
+                // Each dialog opens dated today; the picker lets an older receipt be back-dated.
+                receiptDate = Calendar.getInstance();
+                truncateTime(receiptDate);
+                EditText receiptDateView = addItemView.findViewById(R.id.item_receipt_date_value);
+                receiptDateView.setText(ReceiptItemAdapter.formatDate(receiptDate.getTime()));
+                receiptDateView.setOnClickListener(v -> showDatePicker(receiptDateView));
 
                 alertBuilder.setTitle(R.string.add_new_fill_up)
                         .setView(addItemView)
@@ -96,13 +111,34 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        ReceiptItem receiptItem = new ReceiptItem(Calendar.getInstance().getTime(),
+        ReceiptItem receiptItem = new ReceiptItem(receiptDate.getTime(),
                 gallonsPurchased, currentMileage, previousMileage);
 
         viewModel.addReceipt(receiptItem);
         previousMileage = currentMileage;
 
         Toast.makeText(this, R.string.fill_up_added, LENGTH_SHORT).show();
+    }
+
+    /**
+     * Opens a day/month/year picker seeded with whatever date the field is currently showing
+     * (today, unless the user has already back-dated this entry).
+     */
+    private void showDatePicker(EditText receiptDateView) {
+        new DatePickerDialog(MainActivity.this, (view, year, monthOfYear, dayOfMonth) -> {
+            receiptDate.set(year, monthOfYear, dayOfMonth, 0, 0, 0);
+            receiptDate.set(Calendar.MILLISECOND, 0);
+            receiptDateView.setText(ReceiptItemAdapter.formatDate(receiptDate.getTime()));
+        }, receiptDate.get(Calendar.YEAR),
+                receiptDate.get(Calendar.MONTH),
+                receiptDate.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private static void truncateTime(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
     }
 
     @Override

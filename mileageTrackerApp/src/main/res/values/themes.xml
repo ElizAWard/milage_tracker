@@ -1,18 +1,53 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.MileageTracker" parent="Theme.AppCompat.DayNight">
+    <!-- Base application theme.
+         Light and night share ONE parent and ONE attribute set; only the color values differ.
+         Keeping the files structurally identical is the whole point - divergent parents is what
+         made the two modes render differently, and it would break any Material-only widget in
+         one mode only. -->
+    <style name="Theme.MileageTracker" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
-<!--        <item name="colorPrimary">@color/purple_500</item>-->
-<!--        <item name="colorPrimaryVariant">@color/purple_700</item>-->
-<!--        <item name="colorOnPrimary">@color/white</item>-->
-<!--        &lt;!&ndash; Secondary brand color. &ndash;&gt;-->
-<!--        <item name="colorSecondary">@color/teal_200</item>-->
-<!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
-<!--        <item name="colorOnSecondary">@color/black</item>-->
-<!--        &lt;!&ndash; Status bar color. &ndash;&gt;-->
-<!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
-        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar sits above the action bar, so it reads as the same surface. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorSurface</item>
+        <!-- Without this the system keeps drawing light status-bar icons, which on a white
+             status bar means white-on-white and an effectively blank bar. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <!-- The bar follows the surface (white in light), not the brand color. See below. -->
+        <item name="actionBarStyle">@style/Theme.MileageTracker.ActionBar</item>
+        <!-- Material's own default is FilledBox, whose fill is colorOnSurface @12% alpha and so
+             renders #E0E0E0 grey on this app's white dialog. See the style below. -->
+        <item name="textInputStyle">@style/Theme.MileageTracker.TextInput</item>
     </style>
 
+    <!--
+      Keeps Material's filled text fields (floating label, focus stroke, shape) but fills them with
+      the surface colour, so they read white against the white dialog instead of Material's grey.
+      Declared once: colorSurface already resolves per configuration (white in light, dark in night),
+      so there is nothing mode-specific to duplicate in values-night.
+    -->
+    <style name="Theme.MileageTracker.TextInput" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">?attr/colorSurface</item>
+        <!-- Material draws a 1dp unfocused stroke around every box, which reads as a divider line
+             under each field row. Zeroed here; the focused stroke is left alone so the field you
+             are typing in still outlines itself. -->
+        <item name="boxStrokeWidth">0dp</item>
+    </style>
 
+    <!--
+      Stock AppCompat/Material paints the action bar with ?attr/colorPrimary, which here would
+      put purple behind this app's dark title text. Tinting it with the surface keeps light mode's
+      white bar and night mode's dark bar while both modes still share one parent theme.
+      background/backgroundStacked/backgroundSplit mirror exactly what the stock style sets.
+    -->
+    <style name="Theme.MileageTracker.ActionBar" parent="Widget.MaterialComponents.Light.ActionBar.Solid">
+        <item name="background">?attr/colorSurface</item>
+        <item name="backgroundStacked">?attr/colorSurface</item>
+        <item name="backgroundSplit">?attr/colorSurface</item>
+    </style>
 </resources>

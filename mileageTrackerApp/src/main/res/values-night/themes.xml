@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.MileageTracker" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <!-- Mirror of values/themes.xml: identical parent, identical attributes, night colors only. -->
+    <style name="Theme.MileageTracker" parent="Theme.MaterialComponents.DayNight">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -11,6 +11,22 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
+        <!-- Night status bar is dark, so it keeps light icons. Pairs with the light theme's true. -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <!-- The bar follows the surface (near-black in night), not the brand color. See below. -->
+        <item name="actionBarStyle">@style/Theme.MileageTracker.ActionBar</item>
+        <!-- Pairs with the light theme's entry: same surface-filled text fields in both modes.
+             The style itself lives in values/themes.xml - colorSurface needs no night duplicate. -->
+        <item name="textInputStyle">@style/Theme.MileageTracker.TextInput</item>
+    </style>
+
+    <!--
+      Night counterpart of the light theme's action bar style: same surface tint, but parented to
+      the dark-action-bar widget so the title and menu icon stay light on a dark bar.
+    -->
+    <style name="Theme.MileageTracker.ActionBar" parent="Widget.MaterialComponents.ActionBar.Primary">
+        <item name="background">?attr/colorSurface</item>
+        <item name="backgroundStacked">?attr/colorSurface</item>
+        <item name="backgroundSplit">?attr/colorSurface</item>
     </style>
 </resources>
