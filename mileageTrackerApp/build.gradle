@@ -47,4 +47,11 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
     // End Room Persistence
+
+    // Lifecycle (ViewModel + LiveData). room-runtime 2.5.2 does NOT pull these in
+    // transitively, so they have to be declared explicitly for the LiveData
+    // return types on the DAO to resolve.
+    def lifecycle_version = "2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
 }
