@@ -36,32 +36,36 @@ public class ReceiptItemAdapter extends RecyclerView.Adapter<ReceiptItemAdapter.
 
     @Override
     public int getItemCount() {
-        return this.items.size();
+        return items.size();
     }
 
     public void addReceipt(ReceiptItem item) {
-        this.items.add(item);
+        items.add(item);
         notifyDataSetChanged();
     }
 
     static class ReceiptItemViewHolder extends RecyclerView.ViewHolder {
 
         TextView dateDisplay;
-        TextView milesDisplay;
+        TextView gallonsDisplay;
+        TextView odometerDisplay;
         TextView averageMileageDisplay;
 
         public ReceiptItemViewHolder(@NonNull View itemView) {
             super(itemView);
+
             dateDisplay = itemView.findViewById(R.id.date_display);
-            milesDisplay = itemView.findViewById(R.id.miles_display);
+            gallonsDisplay = itemView.findViewById(R.id.gallons_display);
+            odometerDisplay = itemView.findViewById(R.id.odometer_display);
             averageMileageDisplay = itemView.findViewById(R.id.average_mileage_display);
         }
 
         public void bind(ReceiptItem receiptItem) {
             dateDisplay.setText(receiptItem.getDate().toString());
-            milesDisplay.setText(receiptItem.getCurrentMileage());
+            gallonsDisplay.setText(receiptItem.getGallonsPurchased().toString());
+            odometerDisplay.setText(receiptItem.getCurrentMileage().toString());
             // TODO calculate actual average
-            averageMileageDisplay.setText("12");
+            averageMileageDisplay.setText(receiptItem.getAverageMpg().toString());
         }
     }
 }

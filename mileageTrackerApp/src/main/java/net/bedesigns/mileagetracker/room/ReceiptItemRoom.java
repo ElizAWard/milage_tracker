@@ -111,11 +111,12 @@ public class ReceiptItemRoom implements IReceiptItemCollection {
     }
 
     private ReceiptItem convertEntityToModel(ReceiptItemEntity entity) {
-        return new ReceiptItem(entity.date, entity.currentMileage, entity.gallonsPurchased);
+        return new ReceiptItem(entity.date, entity.gallonsPurchased, entity.currentMileage, entity.previousMileage);
     }
 
     private ReceiptItemEntity convertModelToEntity(ReceiptItem item) {
-        return new ReceiptItemEntity(currentVehicle, item.getDate(), item.getCurrentMileage(), item.getGallonsPurchased());
+        return new ReceiptItemEntity(currentVehicle, item.getDate(), item.getGallonsPurchased(),
+                item.getCurrentMileage(), item.getPreviousMileage());
     }
 
     private List<ReceiptItem> convertEntityToModel(List<ReceiptItemEntity> entityList) {
