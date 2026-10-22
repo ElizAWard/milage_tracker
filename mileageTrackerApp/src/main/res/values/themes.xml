@@ -20,23 +20,6 @@
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <!-- The bar follows the surface (white in light), not the brand color. See below. -->
         <item name="actionBarStyle">@style/Theme.MileageTracker.ActionBar</item>
-        <!-- Material's own default is FilledBox, whose fill is colorOnSurface @12% alpha and so
-             renders #E0E0E0 grey on this app's white dialog. See the style below. -->
-        <item name="textInputStyle">@style/Theme.MileageTracker.TextInput</item>
-    </style>
-
-    <!--
-      Keeps Material's filled text fields (floating label, focus stroke, shape) but fills them with
-      the surface colour, so they read white against the white dialog instead of Material's grey.
-      Declared once: colorSurface already resolves per configuration (white in light, dark in night),
-      so there is nothing mode-specific to duplicate in values-night.
-    -->
-    <style name="Theme.MileageTracker.TextInput" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="boxBackgroundColor">?attr/colorSurface</item>
-        <!-- Material draws a 1dp unfocused stroke around every box, which reads as a divider line
-             under each field row. Zeroed here; the focused stroke is left alone so the field you
-             are typing in still outlines itself. -->
-        <item name="boxStrokeWidth">0dp</item>
     </style>
 
     <!--
