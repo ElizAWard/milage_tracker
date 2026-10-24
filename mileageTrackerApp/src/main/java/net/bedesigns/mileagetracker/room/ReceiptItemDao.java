@@ -38,4 +38,10 @@ public interface ReceiptItemDao {
 
     @Query("SELECT COUNT(*) FROM Fill_ups WHERE vehicleName = :vehicleName")
     int getFillUpCount(String vehicleName);
+
+    /**
+     * Wipes every fill-up for the vehicle in one statement, used by the "Delete All" menu action.
+     */
+    @Query("DELETE FROM Fill_ups WHERE vehicleName = :vehicleName")
+    int deleteAllForVehicle(String vehicleName);
 }

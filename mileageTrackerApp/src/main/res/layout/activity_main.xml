@@ -53,6 +53,7 @@
         android:id="@+id/entries_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/selection_bar"
         android:layout_below="@id/column_titles"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -67,5 +68,46 @@
         android:layout_alignParentEnd="true"
         app:srcCompat="@drawable/ic_add_white_24"
         android:contentDescription="@string/add_trip_info" />
+
+    <!-- Shown only while the list is in Delete mode: reports how many rows are ticked and
+         offers the commit (and backing out of the mode) actions. -->
+    <LinearLayout
+        android:id="@+id/selection_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="?attr/colorSurface"
+        android:elevation="@dimen/bar_elevation"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/fab_margin"
+        android:paddingEnd="@dimen/fab_margin"
+        android:paddingTop="@dimen/top_margin"
+        android:paddingBottom="@dimen/top_margin"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/selection_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="@dimen/font_entry_size"
+            tools:text="0 selected" />
+
+        <Button
+            android:id="@+id/cancel_selection"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" />
+
+        <Button
+            android:id="@+id/delete_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:enabled="false"
+            android:text="@string/delete" />
+    </LinearLayout>
 
 </RelativeLayout>

@@ -19,6 +19,14 @@
     <string name="export">Export</string>
     <string name="import_string">Import</string>
     <string name="date">Date</string>
+    <string name="delete">Delete</string>
+    <string name="delete_all">Delete All</string>
+    <string name="delete_all_title">Delete all fill-ups?</string>
+    <string name="all_fill_ups_deleted">All fill-ups deleted</string>
+    <string name="fill_ups_selected">%1$d selected</string>
+    <string name="delete_selected_title">Delete %1$d selected fill-up(s)?</string>
+    <string name="delete_selected_message">This cannot be undone.</string>
+    <string name="fill_ups_deleted">Selected fill-ups deleted</string>
     <string name="miles">Miles</string>
     <string name="mpg">MPG</string>
     <string name="odometer">Odometer</string>
