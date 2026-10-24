@@ -211,6 +211,26 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * "Delete All" wipes the whole list, so it gets the same confirmation step as the ticked
+     * rows - one tap of a menu item must never destroy the data on its own.
+     */
+    private void confirmDeleteAll() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.delete_all_title)
+                .setMessage(R.string.delete_selected_message)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    // Leaving Delete mode first drops any ticks that are about to vanish anyway.
+                    if (receiptAdapter.isSelectionMode()) {
+                        exitSelectionMode();
+                    }
+                    viewModel.deleteAllReceipts();
+                    Toast.makeText(this, R.string.all_fill_ups_deleted, LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -237,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 enterSelectionMode();
             }
+            return true;
+        }
+
+        // Wipes the whole list, after asking first.
+        if (id == R.id.action_delete_all) {
+            confirmDeleteAll();
             return true;
         }
 

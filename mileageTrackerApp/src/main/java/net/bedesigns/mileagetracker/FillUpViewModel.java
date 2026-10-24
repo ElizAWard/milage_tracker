@@ -76,6 +76,15 @@ public class FillUpViewModel extends AndroidViewModel {
         ReceiptItemDatabase.databaseWriteExecutor.execute(() -> dao.deleteReceiptItem(entities));
     }
 
+    /**
+     * Removes every fill-up for {@link #DEFAULT_VEHICLE} (the "Delete All" menu action), once
+     * the caller has confirmed it with the user. The observed list re-emits when it lands.
+     */
+    public void deleteAllReceipts() {
+        ReceiptItemDatabase.databaseWriteExecutor.execute(() ->
+                dao.deleteAllForVehicle(DEFAULT_VEHICLE));
+    }
+
     private static ReceiptItemEntity toEntity(ReceiptItem receipt) {
         return new ReceiptItemEntity(DEFAULT_VEHICLE, receipt.getDate(), receipt.getGallonsPurchased(),
                 receipt.getCurrentMileage(), receipt.getPreviousMileage());
