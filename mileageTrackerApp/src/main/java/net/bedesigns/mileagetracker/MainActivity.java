@@ -10,11 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,6 +35,22 @@ public class MainActivity extends AppCompatActivity {
 
     private FillUpViewModel viewModel;
     private ReceiptItemAdapter receiptAdapter;
+    private FloatingActionButton fab;
+    /** Footer shown only in Delete mode: live tick count plus Cancel/Delete. */
+    private View selectionBar;
+    private TextView selectionCount;
+    private View deleteSelectionButton;
+    /**
+     * Backing out of Delete mode (rather than the whole app) while it is active, so a stray back
+     * press cannot silently discard a half-made selection.
+     */
+    private final OnBackPressedCallback selectionBackPress =
+            new OnBackPressedCallback(false) {
+                @Override
+                public void handleOnBackPressed() {
+                    exitSelectionMode();
+                }
+            };
     /**
      * Odometer reading of the most recent fill-up, used as the "previous" reading for the next
      * one. Restored from the database on start, so MPG stays correct across restarts.
@@ -53,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(FillUpViewModel.class);
 
         // TODO fab could be an exploding fab and allow for adding vehicles
-        FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -88,6 +106,14 @@ public class MainActivity extends AppCompatActivity {
                 RecyclerView.VERTICAL, false));
         receiptAdapter = new ReceiptItemAdapter(new ArrayList<>());
         entriesRecyclerView.setAdapter(receiptAdapter);
+
+        selectionBar = findViewById(R.id.selection_bar);
+        selectionCount = findViewById(R.id.selection_count);
+        deleteSelectionButton = findViewById(R.id.delete_selection);
+        findViewById(R.id.cancel_selection).setOnClickListener(v -> exitSelectionMode());
+        deleteSelectionButton.setOnClickListener(v -> confirmDeleteSelection());
+        receiptAdapter.setOnSelectionChangedListener(this::updateSelectionBar);
+        getOnBackPressedDispatcher().addCallback(this, selectionBackPress);
 
         // The list is driven entirely by the database: whatever Room has saved is what renders,
         // both on a fresh start and after every add.
@@ -141,6 +167,50 @@ public class MainActivity extends AppCompatActivity {
         calendar.set(Calendar.MILLISECOND, 0);
     }
 
+    /**
+     * Switches the list into Delete mode: every row grows a tick box, the add button steps out
+     * of the way, and the footer offers Cancel/Delete until the user backs out or commits.
+     */
+    private void enterSelectionMode() {
+        receiptAdapter.setSelectionMode(true);
+        selectionBar.setVisibility(View.VISIBLE);
+        fab.hide();
+        selectionBackPress.setEnabled(true);
+        updateSelectionBar(0);
+    }
+
+    private void exitSelectionMode() {
+        receiptAdapter.setSelectionMode(false);
+        selectionBar.setVisibility(View.GONE);
+        fab.show();
+        selectionBackPress.setEnabled(false);
+    }
+
+    /** Keeps the footer honest: "3 selected", and Delete only live once something is ticked. */
+    private void updateSelectionBar(int selectedCount) {
+        selectionCount.setText(getString(R.string.fill_ups_selected, selectedCount));
+        deleteSelectionButton.setEnabled(selectedCount > 0);
+    }
+
+    /** Asks for confirmation before dropping the ticked rows for good. */
+    private void confirmDeleteSelection() {
+        List<ReceiptItem> selected = receiptAdapter.getSelectedReceipts();
+        if (selected.isEmpty()) {
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.delete_selected_title, selected.size()))
+                .setMessage(R.string.delete_selected_message)
+                .setPositiveButton(R.string.delete, (dialog, which) -> {
+                    viewModel.deleteReceipts(selected);
+                    exitSelectionMode();
+                    Toast.makeText(this, R.string.fill_ups_deleted, LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -157,6 +227,16 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        // Enters (or, if already ticking rows, leaves) Delete mode.
+        if (id == R.id.action_delete) {
+            if (receiptAdapter.isSelectionMode()) {
+                exitSelectionMode();
+            } else {
+                enterSelectionMode();
+            }
             return true;
         }
 
