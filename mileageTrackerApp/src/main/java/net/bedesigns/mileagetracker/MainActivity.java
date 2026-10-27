@@ -2,7 +2,11 @@ package net.bedesigns.mileagetracker;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,12 +21,18 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -62,6 +72,35 @@ public class MainActivity extends AppCompatActivity {
      * Time of day is always zeroed: a receipt only has a day, never an hour.
      */
     private Calendar receiptDate = Calendar.getInstance();
+    /**
+     * Mirror of what is on screen, kept by the LiveData observer so Export always has a
+     * snapshot to write even if the database query is mid-refresh.
+     */
+    private final List<ReceiptItem> currentItems = new ArrayList<>();
+    /**
+     * System file picker for Import. Registered as a field, because the activity result API
+     * only accepts registration before the activity reaches {@code STARTED}.
+     */
+    private final ActivityResultLauncher<String[]> importCsvLauncher =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+                    uri -> {
+                        if (uri != null) {
+                            importCsv(uri);
+                        }
+                    });
+    /**
+     * Asks for {@code WRITE_EXTERNAL_STORAGE} before Download writes into the shared folder.
+     * Only ever requested on API 24-28, see {@link CsvDownload#requiresStoragePermission()}.
+     */
+    private final ActivityResultLauncher<String> storagePermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    startCsvDownload();
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            R.string.storage_permission_required, Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +159,9 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getFillUps().observe(this, entities -> {
             List<ReceiptItem> items = FillUpViewModel.toModel(entities);
             receiptAdapter.setReceipts(items);
+
+            currentItems.clear();
+            currentItems.addAll(items);
 
             // Query orders by mileage DESC, so index 0 is the most recent fill-up.
             previousMileage = items.isEmpty() ? null : items.get(0).getCurrentMileage();
@@ -231,6 +273,128 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Writes the current fill-ups to CSV on a background thread, then offers the file to
+     * whatever app the user wants to send it to (Drive, Gmail, a file manager, ...).
+     */
+    private void exportCsv() {
+        if (currentItems.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_export, LENGTH_SHORT).show();
+            return;
+        }
+
+        // Snapshot now: the observer may swap the list out from under the background write.
+        List<ReceiptItem> snapshot = new ArrayList<>(currentItems);
+
+        CsvExport.exportExecutor.execute(() -> {
+            try {
+                File file = CsvExport.write(getApplicationContext(), snapshot);
+                runOnUiThread(() -> shareCsv(file));
+            } catch (IOException e) {
+                Log.e(TAG, "CSV export failed", e);
+                runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, R.string.export_failed, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /** Opens the share sheet for a freshly written export, granting read access to the target. */
+    private void shareCsv(File file) {
+        Uri csvUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND)
+                .setType("text/csv")
+                .putExtra(Intent.EXTRA_STREAM, csvUri)
+                .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.export)));
+    }
+
+    /**
+     * Download is the same CSV as Export, but it lands in the device's Downloads folder instead
+     * of being handed to a share sheet - so on pre-scoped-storage devices it first needs the
+     * storage permission that writing a shared folder requires.
+     */
+    private void downloadCsv() {
+        if (currentItems.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_export, LENGTH_SHORT).show();
+            return;
+        }
+
+        if (CsvDownload.requiresStoragePermission()
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return;
+        }
+
+        startCsvDownload();
+    }
+
+    /** Writes the current snapshot to Downloads off the main thread, then reports the name. */
+    private void startCsvDownload() {
+        List<ReceiptItem> snapshot = new ArrayList<>(currentItems);
+
+        CsvExport.exportExecutor.execute(() -> {
+            try {
+                String fileName = CsvDownload.saveToDownloads(getApplicationContext(), snapshot);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        getString(R.string.downloaded_to, fileName), LENGTH_SHORT).show());
+            } catch (IOException e) {
+                Log.e(TAG, "Download failed", e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        R.string.download_failed, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /**
+     * Opens the picker, then parses the chosen document off the main thread and only asks to
+     * import once the whole file is known to be readable.
+     */
+    private void launchImportPicker() {
+        importCsvLauncher.launch(CsvImport.MIME_TYPES);
+    }
+
+    private void importCsv(Uri uri) {
+        CsvImport.importExecutor.execute(() -> {
+            try {
+                List<ReceiptItem> imported = CsvImport.read(getApplicationContext(), uri);
+                runOnUiThread(() -> confirmImport(imported));
+            } catch (CsvImport.CsvImportException e) {
+                Log.w(TAG, "Rejected CSV: " + e.getMessage());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        getString(R.string.import_invalid, e.getMessage()),
+                        Toast.LENGTH_LONG).show());
+            } catch (IOException e) {
+                Log.e(TAG, "Could not read the chosen CSV", e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        R.string.import_read_error, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /** The last gate before anything is written: spells out how the rows will be chained. */
+    private void confirmImport(List<ReceiptItem> imported) {
+        if (imported.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_import, LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.import_title, imported.size()))
+                .setMessage(R.string.import_message)
+                .setPositiveButton(R.string.import_string, (dialog, which) -> {
+                    viewModel.importReceipts(imported);
+                    Toast.makeText(this,
+                            getString(R.string.import_success, imported.size()),
+                            LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -245,8 +409,18 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_export) {
+            exportCsv();
+            return true;
+        }
+
+        if (id == R.id.action_download) {
+            downloadCsv();
+            return true;
+        }
+
+        if (id == R.id.action_import) {
+            launchImportPicker();
             return true;
         }
 

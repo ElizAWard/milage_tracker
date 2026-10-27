@@ -68,10 +68,7 @@ public class FillUpViewModel extends AndroidViewModel {
      * vehicle + odometer reading, so matching entities are all it needs to drop them.
      */
     public void deleteReceipts(@NonNull List<ReceiptItem> receipts) {
-        List<ReceiptItemEntity> entities = new ArrayList<>(receipts.size());
-        for (ReceiptItem receipt : receipts) {
-            entities.add(toEntity(receipt));
-        }
+        List<ReceiptItemEntity> entities = toEntities(receipts);
 
         ReceiptItemDatabase.databaseWriteExecutor.execute(() -> dao.deleteReceiptItem(entities));
     }
@@ -85,9 +82,28 @@ public class FillUpViewModel extends AndroidViewModel {
                 dao.deleteAllForVehicle(DEFAULT_VEHICLE));
     }
 
+    /**
+     * Saves several fill-ups at once (the import flow), replacing any existing row that shares
+     * an odometer reading, since that reading is part of the primary key.
+     */
+    public void importReceipts(@NonNull List<ReceiptItem> receipts) {
+        ReceiptItemDatabase.databaseWriteExecutor.execute(() ->
+                dao.insertOrUpdateReceiptItems(toEntities(receipts)));
+    }
+
     private static ReceiptItemEntity toEntity(ReceiptItem receipt) {
         return new ReceiptItemEntity(DEFAULT_VEHICLE, receipt.getDate(), receipt.getGallonsPurchased(),
                 receipt.getCurrentMileage(), receipt.getPreviousMileage());
+    }
+
+    private static List<ReceiptItemEntity> toEntities(List<ReceiptItem> receipts) {
+        List<ReceiptItemEntity> entities = new ArrayList<>(receipts.size());
+
+        for (ReceiptItem receipt : receipts) {
+            entities.add(toEntity(receipt));
+        }
+
+        return entities;
     }
 
     public static List<ReceiptItem> toModel(List<ReceiptItemEntity> entities) {
