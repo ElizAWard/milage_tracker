@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the exports folder is exposed. CsvExport.EXPORT_DIR and the path below must agree,
+     or FileProvider.getUriForFile() will throw a Failed to find configured root error. -->
+<paths>
+    <files-path
+        name="exports"
+        path="exports/" />
+</paths>

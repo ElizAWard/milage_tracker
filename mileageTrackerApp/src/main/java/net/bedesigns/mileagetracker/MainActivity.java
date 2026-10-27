@@ -3,6 +3,8 @@ package net.bedesigns.mileagetracker;
 import static android.widget.Toast.LENGTH_SHORT;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +21,13 @@ import com.google.android.material.textfield.TextInputLayout;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -62,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
      * Time of day is always zeroed: a receipt only has a day, never an hour.
      */
     private Calendar receiptDate = Calendar.getInstance();
+    /**
+     * Mirror of what is on screen, kept by the LiveData observer so Export always has a
+     * snapshot to write even if the database query is mid-refresh.
+     */
+    private final List<ReceiptItem> currentItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
         viewModel.getFillUps().observe(this, entities -> {
             List<ReceiptItem> items = FillUpViewModel.toModel(entities);
             receiptAdapter.setReceipts(items);
+
+            currentItems.clear();
+            currentItems.addAll(items);
 
             // Query orders by mileage DESC, so index 0 is the most recent fill-up.
             previousMileage = items.isEmpty() ? null : items.get(0).getCurrentMileage();
@@ -231,6 +244,44 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    /**
+     * Writes the current fill-ups to CSV on a background thread, then offers the file to
+     * whatever app the user wants to send it to (Drive, Gmail, a file manager, ...).
+     */
+    private void exportCsv() {
+        if (currentItems.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_export, LENGTH_SHORT).show();
+            return;
+        }
+
+        // Snapshot now: the observer may swap the list out from under the background write.
+        List<ReceiptItem> snapshot = new ArrayList<>(currentItems);
+
+        CsvExport.exportExecutor.execute(() -> {
+            try {
+                File file = CsvExport.write(getApplicationContext(), snapshot);
+                runOnUiThread(() -> shareCsv(file));
+            } catch (IOException e) {
+                Log.e(TAG, "CSV export failed", e);
+                runOnUiThread(() ->
+                        Toast.makeText(MainActivity.this, R.string.export_failed, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /** Opens the share sheet for a freshly written export, granting read access to the target. */
+    private void shareCsv(File file) {
+        Uri csvUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND)
+                .setType("text/csv")
+                .putExtra(Intent.EXTRA_STREAM, csvUri)
+                .putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name))
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.export)));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -245,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_export) {
+            exportCsv();
             return true;
         }
 
