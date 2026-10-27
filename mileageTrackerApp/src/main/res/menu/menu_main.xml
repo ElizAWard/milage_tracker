@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="net.bedesigns.mileagetracker.MainActivity">
     <item
-        android:id="@+id/action_export"
+        android:id="@+id/action_download"
         android:orderInCategory="100"
+        android:title="@string/download"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_export"
+        android:orderInCategory="102"
         android:title="@string/export"
         app:showAsAction="never" />
     <item

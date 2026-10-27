@@ -2,8 +2,10 @@ package net.bedesigns.mileagetracker;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +25,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -85,6 +88,19 @@ public class MainActivity extends AppCompatActivity {
                             importCsv(uri);
                         }
                     });
+    /**
+     * Asks for {@code WRITE_EXTERNAL_STORAGE} before Download writes into the shared folder.
+     * Only ever requested on API 24-28, see {@link CsvDownload#requiresStoragePermission()}.
+     */
+    private final ActivityResultLauncher<String> storagePermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
+                if (granted) {
+                    startCsvDownload();
+                } else {
+                    Toast.makeText(MainActivity.this,
+                            R.string.storage_permission_required, Toast.LENGTH_LONG).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -296,6 +312,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Download is the same CSV as Export, but it lands in the device's Downloads folder instead
+     * of being handed to a share sheet - so on pre-scoped-storage devices it first needs the
+     * storage permission that writing a shared folder requires.
+     */
+    private void downloadCsv() {
+        if (currentItems.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_export, LENGTH_SHORT).show();
+            return;
+        }
+
+        if (CsvDownload.requiresStoragePermission()
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            return;
+        }
+
+        startCsvDownload();
+    }
+
+    /** Writes the current snapshot to Downloads off the main thread, then reports the name. */
+    private void startCsvDownload() {
+        List<ReceiptItem> snapshot = new ArrayList<>(currentItems);
+
+        CsvExport.exportExecutor.execute(() -> {
+            try {
+                String fileName = CsvDownload.saveToDownloads(getApplicationContext(), snapshot);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        getString(R.string.downloaded_to, fileName), LENGTH_SHORT).show());
+            } catch (IOException e) {
+                Log.e(TAG, "Download failed", e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        R.string.download_failed, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /**
      * Opens the picker, then parses the chosen document off the main thread and only asks to
      * import once the whole file is known to be readable.
      */
@@ -357,6 +411,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_export) {
             exportCsv();
+            return true;
+        }
+
+        if (id == R.id.action_download) {
+            downloadCsv();
             return true;
         }
 
