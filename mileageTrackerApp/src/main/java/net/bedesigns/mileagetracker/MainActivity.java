@@ -19,6 +19,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -72,6 +74,17 @@ public class MainActivity extends AppCompatActivity {
      * snapshot to write even if the database query is mid-refresh.
      */
     private final List<ReceiptItem> currentItems = new ArrayList<>();
+    /**
+     * System file picker for Import. Registered as a field, because the activity result API
+     * only accepts registration before the activity reaches {@code STARTED}.
+     */
+    private final ActivityResultLauncher<String[]> importCsvLauncher =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+                    uri -> {
+                        if (uri != null) {
+                            importCsv(uri);
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -282,6 +295,52 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent, getString(R.string.export)));
     }
 
+    /**
+     * Opens the picker, then parses the chosen document off the main thread and only asks to
+     * import once the whole file is known to be readable.
+     */
+    private void launchImportPicker() {
+        importCsvLauncher.launch(CsvImport.MIME_TYPES);
+    }
+
+    private void importCsv(Uri uri) {
+        CsvImport.importExecutor.execute(() -> {
+            try {
+                List<ReceiptItem> imported = CsvImport.read(getApplicationContext(), uri);
+                runOnUiThread(() -> confirmImport(imported));
+            } catch (CsvImport.CsvImportException e) {
+                Log.w(TAG, "Rejected CSV: " + e.getMessage());
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        getString(R.string.import_invalid, e.getMessage()),
+                        Toast.LENGTH_LONG).show());
+            } catch (IOException e) {
+                Log.e(TAG, "Could not read the chosen CSV", e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                        R.string.import_read_error, Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    /** The last gate before anything is written: spells out how the rows will be chained. */
+    private void confirmImport(List<ReceiptItem> imported) {
+        if (imported.isEmpty()) {
+            Toast.makeText(this, R.string.nothing_to_import, LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.import_title, imported.size()))
+                .setMessage(R.string.import_message)
+                .setPositiveButton(R.string.import_string, (dialog, which) -> {
+                    viewModel.importReceipts(imported);
+                    Toast.makeText(this,
+                            getString(R.string.import_success, imported.size()),
+                            LENGTH_SHORT).show();
+                })
+                .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -298,6 +357,11 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_export) {
             exportCsv();
+            return true;
+        }
+
+        if (id == R.id.action_import) {
+            launchImportPicker();
             return true;
         }
 
